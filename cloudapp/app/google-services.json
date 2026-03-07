@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "581276555459",
+    "project_id": "food-waste-reduction-app-10cf5",
+    "storage_bucket": "food-waste-reduction-app-10cf5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:581276555459:android:5b783523a6bda4703fea76",
+        "android_client_info": {
+          "package_name": "com.example.cloudapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAAzfe23MIZKGfjE6rwlbnrJHl9xUSw-I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
