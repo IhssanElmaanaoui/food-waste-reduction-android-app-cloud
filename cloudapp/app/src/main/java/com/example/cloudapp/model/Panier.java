@@ -2,6 +2,7 @@ package com.example.cloudapp.model;
 
 public class Panier {
     private String id;
+    private String merchantId;
     private String commerceName;
     private String description;
     private double price;
@@ -13,6 +14,7 @@ public class Panier {
 
     public Panier(
             String id,
+            String merchantId,
             String commerceName,
             String description,
             double price,
@@ -20,6 +22,7 @@ public class Panier {
             boolean available
     ) {
         this.id = id;
+        this.merchantId = merchantId;
         this.commerceName = commerceName;
         this.description = description;
         this.price = price;
@@ -33,6 +36,14 @@ public class Panier {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getMerchantId() {
+        return merchantId;
+    }
+
+    public void setMerchantId(String merchantId) {
+        this.merchantId = merchantId;
     }
 
     public String getCommerceName() {

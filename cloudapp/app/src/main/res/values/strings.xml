@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">cloud app</string>
+    <string name="back">Retour</string>
+    <string-array name="user_roles">
+        <item>client</item>
+        <item>merchant</item>
+        <item>admin</item>
+    </string-array>
 </resources>

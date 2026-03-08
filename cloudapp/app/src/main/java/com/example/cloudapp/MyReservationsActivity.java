@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.cloudapp.adapter.ReservationAdapter;
 import com.example.cloudapp.data.PanierRepository;
 import com.example.cloudapp.model.Reservation;
+import com.google.firebase.firestore.ListenerRegistration;
 
 public class MyReservationsActivity extends AppCompatActivity implements ReservationAdapter.ReservationActionListener {
 
@@ -20,12 +21,14 @@ public class MyReservationsActivity extends AppCompatActivity implements Reserva
     private ReservationAdapter adapter;
     private ProgressBar progressBar;
     private TextView tvEmptyState;
+    private ListenerRegistration reservationsListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_reservations);
 
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
         RecyclerView recyclerView = findViewById(R.id.recyclerReservations);
         progressBar = findViewById(R.id.progressReservations);
         tvEmptyState = findViewById(R.id.tvEmptyReservations);
@@ -35,14 +38,14 @@ public class MyReservationsActivity extends AppCompatActivity implements Reserva
         recyclerView.setAdapter(adapter);
 
         repository = new PanierRepository();
-        loadReservations();
+        startReservationsListener();
     }
 
-    private void loadReservations() {
+    private void startReservationsListener() {
         progressBar.setVisibility(View.VISIBLE);
-        repository.getUserReservations(new PanierRepository.UserReservationsCallback() {
+        reservationsListener = repository.listenMyReservations(new PanierRepository.ReservationsListener() {
             @Override
-            public void onSuccess(java.util.List<Reservation> reservations) {
+            public void onChanged(java.util.List<Reservation> reservations) {
                 progressBar.setVisibility(View.GONE);
                 adapter.submitList(reservations);
                 tvEmptyState.setVisibility(reservations.isEmpty() ? View.VISIBLE : View.GONE);
@@ -67,7 +70,6 @@ public class MyReservationsActivity extends AppCompatActivity implements Reserva
             @Override
             public void onSuccess() {
                 Toast.makeText(MyReservationsActivity.this, "Reservation cancelled", Toast.LENGTH_SHORT).show();
-                loadReservations();
             }
 
             @Override
@@ -88,7 +90,6 @@ public class MyReservationsActivity extends AppCompatActivity implements Reserva
             @Override
             public void onSuccess() {
                 Toast.makeText(MyReservationsActivity.this, "Payment successful", Toast.LENGTH_SHORT).show();
-                loadReservations();
             }
 
             @Override
@@ -96,5 +97,13 @@ public class MyReservationsActivity extends AppCompatActivity implements Reserva
                 Toast.makeText(MyReservationsActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (reservationsListener != null) {
+            reservationsListener.remove();
+        }
+        super.onDestroy();
     }
 }

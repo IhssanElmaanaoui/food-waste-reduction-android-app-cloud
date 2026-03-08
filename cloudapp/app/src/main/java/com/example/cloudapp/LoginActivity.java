@@ -12,6 +12,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuthException;
 
+import com.example.cloudapp.data.PanierRepository;
+
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
 
@@ -19,6 +21,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText etPassword;
     private Button btnLogin;
     private Button btnGoToRegister;
+    private PanierRepository repository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,16 +32,23 @@ public class LoginActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         btnGoToRegister = findViewById(R.id.btnGoToRegister);
+        repository = new PanierRepository();
 
-        if (FirebaseManager.getAuth().getCurrentUser() != null) {
-            goToHome();
-            return;
-        }
-
+        // Toujours afficher la page connexion au démarrage (pas de redirection auto si déjà connecté)
+        findViewById(R.id.btnBack).setOnClickListener(v -> finish());
         btnLogin.setOnClickListener(v -> login());
         btnGoToRegister.setOnClickListener(v -> {
             startActivity(new Intent(this, RegisterActivity.class));
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Réactiver le bouton Login au retour (il est désactivé pendant la tentative de connexion)
+        if (btnLogin != null) {
+            btnLogin.setEnabled(true);
+        }
     }
 
     private void login() {
@@ -53,7 +63,7 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setEnabled(false);
         FirebaseManager.getAuth()
                 .signInWithEmailAndPassword(email, password)
-                .addOnSuccessListener(authResult -> goToHome())
+                .addOnSuccessListener(authResult -> goToRoleHome())
                 .addOnFailureListener(e -> {
                     btnLogin.setEnabled(true);
                     String detail = e.getMessage();
@@ -66,8 +76,35 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    private void goToHome() {
-        startActivity(new Intent(this, HomeActivity.class));
-        finish();
+    private void goToRoleHome() {
+        repository.getCurrentUserRole(new PanierRepository.RoleCallback() {
+            @Override
+            public void onSuccess(String role, boolean approved) {
+                FcmTokenManager.syncCurrentUserToken();
+                if ("merchant".equalsIgnoreCase(role) && !approved) {
+                    btnLogin.setEnabled(true);
+                    Toast.makeText(
+                            LoginActivity.this,
+                            "Compte commerçant en attente de validation par un admin. Connectez-vous en tant qu'admin pour valider.",
+                            Toast.LENGTH_LONG
+                    ).show();
+                    return;
+                }
+                Class<?> target = HomeActivity.class;
+                if ("admin".equalsIgnoreCase(role)) {
+                    target = AdminActivity.class;
+                } else if ("merchant".equalsIgnoreCase(role)) {
+                    target = MerchantActivity.class;
+                }
+                startActivity(new Intent(LoginActivity.this, target));
+                // Ne pas finish() pour que le retour depuis Home/Admin/Merchant revienne ici (pas vers une autre app)
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e(TAG, "Role fetch failed", e);
+                startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+            }
+        });
     }
 }

@@ -5,6 +5,7 @@ import com.google.firebase.Timestamp;
 public class Reservation {
     private String id;
     private String userId;
+    private String merchantId;
     private String panierId;
     private String commerceName;
     private double price;
@@ -17,6 +18,7 @@ public class Reservation {
     public Reservation(
             String id,
             String userId,
+            String merchantId,
             String panierId,
             String commerceName,
             double price,
@@ -25,6 +27,7 @@ public class Reservation {
     ) {
         this.id = id;
         this.userId = userId;
+        this.merchantId = merchantId;
         this.panierId = panierId;
         this.commerceName = commerceName;
         this.price = price;
@@ -46,6 +49,14 @@ public class Reservation {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getMerchantId() {
+        return merchantId;
+    }
+
+    public void setMerchantId(String merchantId) {
+        this.merchantId = merchantId;
     }
 
     public String getPanierId() {

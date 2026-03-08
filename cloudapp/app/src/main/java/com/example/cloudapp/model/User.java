@@ -5,15 +5,17 @@ public class User {
     private String name;
     private String email;
     private String role;
+    private boolean approved;
 
     public User() {
     }
 
-    public User(String id, String name, String email, String role) {
+    public User(String id, String name, String email, String role, boolean approved) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.role = role;
+        this.approved = approved;
     }
 
     public String getId() {
@@ -46,5 +48,13 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public boolean isApproved() {
+        return approved;
+    }
+
+    public void setApproved(boolean approved) {
+        this.approved = approved;
     }
 }
